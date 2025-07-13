@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-primary-50 to-secondary-50 min-h-screen;
+    font-family: 'friendly', sans-serif;
+  }
+}
+
+@layer components {
+  .card-shadow {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cute-button {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-full 
+           transform transition-all duration-200 hover:scale-105 active:scale-95
+           shadow-lg hover:shadow-xl;
+  }
+  
+  .word-card {
+    @apply bg-white rounded-3xl p-6 card-shadow
+           transform transition-all duration-300 hover:scale-105
+           border-4 border-primary-200;
+  }
+} 

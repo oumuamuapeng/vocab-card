@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幼儿单词卡片 - 演示版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fef7ee',
+                            100: '#fdedd6',
+                            200: '#fbd7ac',
+                            300: '#f8bb77',
+                            400: '#f5953e',
+                            500: '#f2751a',
+                            600: '#e35a0f',
+                            700: '#bc420f',
+                            800: '#963514',
+                            900: '#7a2e14',
+                        },
+                        secondary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        'cute': ['Comic Sans MS', 'cursive'],
+                        'friendly': ['Arial Rounded MT Bold', 'Arial', 'sans-serif']
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .card-shadow {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .cute-button {
+            @apply bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-full 
+                   transform transition-all duration-200 hover:scale-105 active:scale-95
+                   shadow-lg hover:shadow-xl;
+        }
+        .word-card {
+            @apply bg-white rounded-3xl p-6 card-shadow
+                   transform transition-all duration-300 hover:scale-105
+                   border-4 border-primary-200;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-primary-50 to-secondary-50 min-h-screen font-friendly">
+    <div id="app" class="min-h-screen p-6">
+        <!-- 头部 -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-primary-600 mb-2 font-cute">
+                🎓 幼儿单词卡片
+            </h1>
+            <p class="text-lg text-gray-600 font-cute">
+                和宝宝一起快乐学习英语单词吧！
+            </p>
+        </div>
+
+        <!-- 分类网格 -->
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center font-cute">
+                选择学习主题
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6" id="categories">
+                <!-- 分类卡片将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 底部装饰 -->
+        <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2">
+            <div class="text-6xl animate-bounce-slow">🌟</div>
+        </div>
+    </div>
+
+    <script>
+        // 分类数据
+        const categories = [
+            {
+                id: 'animals',
+                name: '动物',
+                icon: '🐾',
+                wordCount: 8,
+                progress: 0,
+                color: 'bg-orange-400'
+            },
+            {
+                id: 'colors',
+                name: '颜色',
+                icon: '🎨',
+                wordCount: 6,
+                progress: 0,
+                color: 'bg-purple-400'
+            },
+            {
+                id: 'numbers',
+                name: '数字',
+                icon: '🔢',
+                wordCount: 5,
+                progress: 0,
+                color: 'bg-blue-400'
+            },
+            {
+                id: 'fruits',
+                name: '水果',
+                icon: '🍎',
+                wordCount: 7,
+                progress: 0,
+                color: 'bg-green-400'
+            },
+            {
+                id: 'shapes',
+                name: '形状',
+                icon: '⭐',
+                wordCount: 6,
+                progress: 0,
+                color: 'bg-pink-400'
+            },
+            {
+                id: 'family',
+                name: '家人',
+                icon: '👨‍👩‍👧‍👦',
+                wordCount: 5,
+                progress: 0,
+                color: 'bg-red-400'
+            }
+        ];
+
+        // 单词数据
+        const words = {
+            animals: [
+                { word: 'Cat', translation: '猫', image: '🐱' },
+                { word: 'Dog', translation: '狗', image: '🐕' },
+                { word: 'Bird', translation: '鸟', image: '🐦' },
+                { word: 'Fish', translation: '鱼', image: '🐠' },
+                { word: 'Rabbit', translation: '兔子', image: '🐰' }
+            ],
+            colors: [
+                { word: 'Red', translation: '红色', image: '🔴' },
+                { word: 'Blue', translation: '蓝色', image: '🔵' },
+                { word: 'Yellow', translation: '黄色', image: '🟡' },
+                { word: 'Green', translation: '绿色', image: '🟢' },
+                { word: 'Purple', translation: '紫色', image: '🟣' }
+            ],
+            numbers: [
+                { word: 'One', translation: '一', image: '1' },
+                { word: 'Two', translation: '二', image: '2' },
+                { word: 'Three', translation: '三', image: '3' },
+                { word: 'Four', translation: '四', image: '4' },
+                { word: 'Five', translation: '五', image: '5' }
+            ]
+        };
+
+        // 渲染分类卡片
+        function renderCategories() {
+            const container = document.getElementById('categories');
+            container.innerHTML = categories.map(category => `
+                <div onclick="selectCategory('${category.id}')" 
+                     class="${category.color} rounded-3xl p-6 cursor-pointer transform transition-all duration-300 hover:scale-105 active:scale-95 card-shadow">
+                    <div class="text-center">
+                        <div class="text-6xl mb-4 animate-pulse-slow">
+                            ${category.icon}
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 font-cute">
+                            ${category.name}
+                        </h3>
+                        <p class="text-white/80 text-sm">
+                            ${category.wordCount} 个单词
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 选择分类
+        function selectCategory(categoryId) {
+            const categoryWords = words[categoryId] || [];
+            if (categoryWords.length === 0) {
+                alert('这个分类还没有单词，敬请期待！');
+                return;
+            }
+            renderStudyView(categoryId, categoryWords);
+        }
+
+        // 渲染学习界面
+        function renderStudyView(categoryId, wordList) {
+            let currentIndex = 0;
+            
+            function renderWord() {
+                const word = wordList[currentIndex];
+                const progress = ((currentIndex + 1) / wordList.length) * 100;
+                
+                document.getElementById('app').innerHTML = `
+                    <div class="min-h-screen p-6">
+                        <div class="max-w-4xl mx-auto">
+                            <div class="flex items-center justify-between mb-6">
+                                <button onclick="renderCategories()" 
+                                        class="text-2xl hover:scale-110 transition-transform bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg">
+                                    ←
+                                </button>
+                                <h1 class="text-2xl font-bold text-primary-600 font-cute">
+                                    学习进度
+                                </h1>
+                                <div class="text-sm text-gray-600 font-cute">
+                                    ${currentIndex + 1} / ${wordList.length}
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <div class="bg-gray-200 rounded-full h-3">
+                                    <div class="bg-primary-500 h-3 rounded-full transition-all duration-300" 
+                                         style="width: ${progress}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-center">
+                                <div class="max-w-md mx-auto">
+                                    <div class="word-card cursor-pointer relative overflow-hidden" onclick="flipCard()">
+                                        <div class="relative mb-4">
+                                            <div class="w-full h-48 bg-gradient-to-br from-primary-200 to-secondary-200 rounded-2xl flex items-center justify-center">
+                                                <span class="text-8xl">${word.image}</span>
+                                            </div>
+                                            <button onclick="playAudio(event)" 
+                                                    class="absolute top-2 right-2 w-12 h-12 rounded-full bg-white/80 flex items-center justify-center transition-all duration-200 hover:bg-white">
+                                                🔊
+                                            </button>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <h2 class="text-3xl font-bold text-primary-600 mb-2 font-cute">
+                                                ${word.word}
+                                            </h2>
+                                            <p class="text-xl text-gray-600 font-cute">
+                                                ${word.translation}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-between items-center mt-6">
+                                        <button onclick="previousWord()" 
+                                                class="cute-button bg-secondary-500 hover:bg-secondary-600" 
+                                                ${currentIndex === 0 ? 'disabled' : ''}>
+                                            ← 上一个
+                                        </button>
+                                        
+                                        <div class="text-center">
+                                            <span class="text-sm text-gray-600 font-cute">
+                                                点击卡片翻转
+                                            </span>
+                                        </div>
+                                        
+                                        <button onclick="nextWord()" 
+                                                class="cute-button" 
+                                                ${currentIndex === wordList.length - 1 ? 'disabled' : ''}>
+                                            下一个 →
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-8">
+                                <p class="text-gray-600 font-cute">
+                                    💡 提示：点击卡片可以翻转查看，点击🔊可以听发音
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 全局函数
+            window.nextWord = function() {
+                if (currentIndex < wordList.length - 1) {
+                    currentIndex++;
+                    renderWord();
+                }
+            };
+
+            window.previousWord = function() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    renderWord();
+                }
+            };
+
+            window.flipCard = function() {
+                alert('卡片翻转效果：显示更多信息！');
+            };
+
+            window.playAudio = function(event) {
+                event.stopPropagation();
+                alert('播放音频：' + wordList[currentIndex].word);
+            };
+
+            renderWord();
+        }
+
+        // 初始化
+        renderCategories();
+    </script>
+</body>
+</html> 
