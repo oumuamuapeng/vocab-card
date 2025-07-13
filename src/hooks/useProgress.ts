@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { StudyProgress, UserProgress, WordFamily } from '../types';
 
 const STORAGE_KEY = 'vocab-card-progress';
@@ -71,11 +71,6 @@ export const useProgress = (currentFamily?: WordFamily) => {
     return progress.familyProgress[currentFamily.id] || null;
   };
 
-  // 获取掌握度（星星数量）
-  const getMasteryLevel = (): number => {
-    const familyProgress = getCurrentFamilyProgress();
-    return familyProgress?.masteryLevel || 0;
-  };
 
   // 检查单词是否已完成
   const isWordCompleted = (word: string): boolean => {
@@ -83,11 +78,32 @@ export const useProgress = (currentFamily?: WordFamily) => {
     return familyProgress?.completedWords.includes(word) || false;
   };
 
+  // 获取任意词族的总进度
+  const getTotalProgress = (family: WordFamily): number => {
+    const familyProgress = progress.familyProgress[family.id];
+    if (!familyProgress) return 0;
+    return (familyProgress.completedWords.length / family.words.length) * 100;
+  };
+
+  // 获取当前学习中的词族的掌握等级
+  const getCurrentMasteryLevel = (): number => {
+    const familyProgress = getCurrentFamilyProgress();
+    return familyProgress?.masteryLevel || 0;
+  };
+
+  // 获取任意词族的掌握等级
+  const getMasteryLevel = (family: WordFamily): number => {
+    const familyProgress = progress.familyProgress[family.id];
+    return familyProgress?.masteryLevel || 0;
+  };
+
   return {
     progress,
     markWordAsCompleted,
     getCurrentFamilyProgress,
+    getCurrentMasteryLevel,
     getMasteryLevel,
     isWordCompleted,
+    getTotalProgress,
   };
 }; 

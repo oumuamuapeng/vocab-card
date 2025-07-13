@@ -20,6 +20,7 @@ export interface WordFamily {
   id: string;
   name: string;
   rime: string;
+  description: string; // 词族描述
   icon: string; // 每个词族也可以有一个代表性图标
   words: WordInFamily[];
 }
